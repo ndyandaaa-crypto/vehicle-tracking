@@ -1,0 +1,67 @@
+<a class="back" routerLink="/drivers">Back to drivers</a>
+
+@if (loading()) {
+  <p class="status" role="status">Loading driver…</p>
+}
+
+@if (error()) {
+  <div class="alert" role="alert"><p>{{ error() }}</p></div>
+}
+
+@if (driver(); as d) {
+  <div class="page-head">
+    <div class="profile-head">
+      <span [class]="'tile tile-lg ' + toneClass(d.id)" aria-hidden="true">{{ initials(d.firstName, d.lastName) }}</span>
+      <div>
+        <h1>{{ d.fullName }}</h1>
+        <p class="muted">Driver</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <section class="card" aria-labelledby="contact-title">
+      <h2 id="contact-title">Contact</h2>
+      <dl class="facts one-col">
+        <div>
+          <dt>Phone</dt>
+          <dd>{{ d.phone }}</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd><a [href]="'mailto:' + d.email">{{ d.email }}</a></dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="card" aria-labelledby="licence-title">
+      <h2 id="licence-title">Licence</h2>
+      <dl class="facts one-col">
+        <div>
+          <dt>Licence number</dt>
+          <dd class="mono">{{ d.licenseNumber }}</dd>
+        </div>
+        <div>
+          <dt>Expires</dt>
+          <dd>
+            {{ d.licenseExpiry | date: 'd MMMM y' }}
+            <span [class]="'tag tag-' + licenseInfo(d.licenseExpiry).state">{{ licenseInfo(d.licenseExpiry).label }}</span>
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="card" aria-labelledby="vehicle-title">
+      <h2 id="vehicle-title">Assigned vehicle</h2>
+      @if (d.vehicle; as v) {
+        <a class="vehicle-link" [routerLink]="['/vehicles', v.id]">
+          <span class="plate">{{ v.registrationNumber }}</span>
+          <span class="sub">{{ v.make }} {{ v.model }}</span>
+        </a>
+        <p class="status-line"><span [class]="'status-chip status-' + v.status.toLowerCase()">{{ v.status | titlecase }}</span></p>
+      } @else {
+        <p class="muted">This driver has no vehicle assigned.</p>
+      }
+    </section>
+  </div>
+}

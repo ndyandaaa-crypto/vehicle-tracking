@@ -1,0 +1,16 @@
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/vehicles">
+      <span class="brand-mark" aria-hidden="true"></span>
+      Fleet tracker
+    </a>
+    <nav aria-label="Main">
+      <a routerLink="/vehicles" routerLinkActive="active">Vehicles</a>
+      <a routerLink="/routes" routerLinkActive="active">Routes</a>
+      <a routerLink="/drivers" routerLinkActive="active">Drivers</a>
+    </nav>
+  </aside>
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

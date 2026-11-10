@@ -1,0 +1,107 @@
+<a class="back" routerLink="/vehicles">Back to vehicles</a>
+
+@if (loading()) {
+  <p class="status" role="status">Loading vehicle…</p>
+}
+
+@if (error()) {
+  <div class="alert" role="alert"><p>{{ error() }}</p></div>
+}
+
+@if (detail(); as d) {
+  <div class="page-head">
+    <div>
+      <span class="plate plate-lg">{{ d.vehicle.registrationNumber }}</span>
+      <h1 class="with-plate">{{ d.vehicle.make }} {{ d.vehicle.model }}</h1>
+      <p class="muted">{{ d.vehicle.type | titlecase }}, {{ d.vehicle.manufactureYear }}</p>
+    </div>
+    <span [class]="'status-chip status-lg status-' + d.vehicle.status.toLowerCase()">{{ d.vehicle.status | titlecase }}</span>
+  </div>
+
+  <div class="grid-2">
+    <section class="card" aria-labelledby="map-title">
+      <h2 id="map-title">Route</h2>
+      @if (d.route; as route) {
+        <p class="muted">{{ route.origin }} to {{ route.destination }}</p>
+        <app-route-map [waypoints]="route.waypoints" [markers]="markers()" />
+        <div class="progress-row">
+          <div class="progress" role="progressbar" aria-label="Route progress" aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="d.vehicle.routeProgress * 100">
+            <div class="progress-bar" [style.width.%]="d.vehicle.routeProgress * 100"></div>
+          </div>
+          <span class="progress-text">{{ d.vehicle.routeProgress | percent: '1.0-0' }} of {{ route.distanceKm }} km</span>
+        </div>
+      } @else {
+        <p class="muted">This vehicle has no route assigned.</p>
+      }
+    </section>
+
+    <div class="stack">
+      <section class="card" aria-labelledby="pos-title">
+        <h2 id="pos-title">Live position</h2>
+        <dl class="facts one-col">
+          <div>
+            <dt>Coordinates</dt>
+            <dd class="mono">
+              @if (d.vehicle.latitude !== null && d.vehicle.longitude !== null) {
+                {{ d.vehicle.latitude | number: '1.4-4' }}, {{ d.vehicle.longitude | number: '1.4-4' }}
+              } @else {
+                Not available
+              }
+            </dd>
+          </div>
+          <div>
+            <dt>Speed</dt>
+            <dd>{{ d.vehicle.speedKph === null ? 'Not available' : (d.vehicle.speedKph | number: '1.0-0') + ' km/h' }}</dd>
+          </div>
+          <div>
+            <dt>Last update</dt>
+            <dd class="mono">{{ d.vehicle.lastUpdated | date: 'd MMM y, HH:mm:ss' }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="card" aria-labelledby="driver-title">
+        <h2 id="driver-title">Driver</h2>
+        @if (d.driver; as driver) {
+          <p class="strong"><a [routerLink]="['/drivers', driver.id]">{{ driver.fullName }}</a></p>
+          <dl class="facts one-col">
+            <div>
+              <dt>Phone</dt>
+              <dd>{{ driver.phone }}</dd>
+            </div>
+            <div>
+              <dt>Licence</dt>
+              <dd>
+                <span class="mono">{{ driver.licenseNumber }}</span>
+                <span [class]="'tag tag-' + licenseInfo(driver.licenseExpiry).state">{{ licenseInfo(driver.licenseExpiry).label }}</span>
+              </dd>
+            </div>
+            <div>
+              <dt>Licence expires</dt>
+              <dd>{{ driver.licenseExpiry | date: 'd MMM y' }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <p class="muted">No driver is assigned to this vehicle.</p>
+        }
+      </section>
+
+      @if (d.route; as route) {
+        <section class="card" aria-labelledby="route-title">
+          <h2 id="route-title">Route details</h2>
+          <p class="strong"><a [routerLink]="['/routes', route.id]">{{ route.name }}</a></p>
+          <dl class="facts one-col">
+            <div>
+              <dt>Distance</dt>
+              <dd>{{ route.distanceKm }} km</dd>
+            </div>
+            <div>
+              <dt>Estimated time</dt>
+              <dd>{{ formatDuration(route.estimatedMinutes) }}</dd>
+            </div>
+          </dl>
+        </section>
+      }
+    </div>
+  </div>
+}

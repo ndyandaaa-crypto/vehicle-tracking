@@ -1,0 +1,18 @@
+<svg class="route-map" [attr.viewBox]="'0 0 ' + width + ' ' + height" role="img" [attr.aria-label]="description()">
+  <rect class="map-bg" x="0" y="0" [attr.width]="width" [attr.height]="height" rx="14" />
+  <polyline class="route-bed" [attr.points]="line()" />
+  <polyline class="route-line" [attr.points]="line()" />
+
+  @for (s of stops(); track $index) {
+    <circle class="stop" [attr.cx]="s.x" [attr.cy]="s.y" r="5" />
+    <text class="stop-label" [attr.x]="s.x" [attr.y]="s.y - 13" text-anchor="middle">{{ s.name }}</text>
+  }
+
+  @for (m of pins(); track m.id) {
+    <g [class]="'pin pin-' + m.status.toLowerCase()">
+      <circle class="pin-halo" [attr.cx]="m.x" [attr.cy]="m.y" r="15" />
+      <circle class="pin-dot" [attr.cx]="m.x" [attr.cy]="m.y" r="7" />
+      <text class="pin-label" [attr.x]="m.x" [attr.y]="m.y + 30" text-anchor="middle">{{ m.label }}</text>
+    </g>
+  }
+</svg>

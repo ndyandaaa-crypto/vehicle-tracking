@@ -1,0 +1,68 @@
+<div class="page-head">
+  <div>
+    <h1>Drivers</h1>
+    @if (!loading() && !error()) {
+      <p class="muted">{{ drivers().length }} {{ drivers().length === 1 ? 'driver' : 'drivers' }}</p>
+    }
+  </div>
+</div>
+
+@if (loading()) {
+  <p class="status" role="status">Loading drivers…</p>
+}
+
+@if (error()) {
+  <div class="alert" role="alert">
+    <p>Could not load drivers. Check that the API is running on http://localhost:8080, then try again.</p>
+    <button type="button" class="btn" (click)="load()">Try again</button>
+  </div>
+}
+
+@if (!loading() && !error()) {
+  @if (drivers().length === 0) {
+    <div class="empty"><h2>No drivers yet</h2><p>Drivers will appear here once they are added.</p></div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Driver</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Licence</th>
+            <th scope="col">Vehicle</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of drivers(); track d.id) {
+            <tr>
+              <td>
+                <a class="person" [routerLink]="['/drivers', d.id]">
+                  <span [class]="'tile ' + toneClass(d.id)" aria-hidden="true">{{ initials(d.firstName, d.lastName) }}</span>
+                  <span>
+                    <span class="strong">{{ d.fullName }}</span>
+                    <span class="sub">{{ d.email }}</span>
+                  </span>
+                </a>
+              </td>
+              <td>{{ d.phone }}</td>
+              <td>
+                <span class="mono">{{ d.licenseNumber }}</span>
+                <span class="sub">
+                  Expires {{ d.licenseExpiry | date: 'd MMM y' }}
+                  <span [class]="'tag tag-' + licenseInfo(d.licenseExpiry).state">{{ licenseInfo(d.licenseExpiry).label }}</span>
+                </span>
+              </td>
+              <td>
+                @if (d.vehicle) {
+                  <a class="plate" [routerLink]="['/vehicles', d.vehicle.id]">{{ d.vehicle.registrationNumber }}</a>
+                } @else {
+                  <span class="muted">Unassigned</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

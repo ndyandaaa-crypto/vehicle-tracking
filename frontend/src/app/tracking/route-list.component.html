@@ -1,0 +1,50 @@
+<div class="page-head">
+  <div>
+    <h1>Routes</h1>
+    @if (!loading() && !error()) {
+      <p class="muted">{{ routes().length }} {{ routes().length === 1 ? 'route' : 'routes' }}</p>
+    }
+  </div>
+</div>
+
+@if (loading()) {
+  <p class="status" role="status">Loading routes…</p>
+}
+
+@if (error()) {
+  <div class="alert" role="alert">
+    <p>Could not load routes. Check that the API is running on http://localhost:8080, then try again.</p>
+    <button type="button" class="btn" (click)="load()">Try again</button>
+  </div>
+}
+
+@if (!loading() && !error()) {
+  @if (routes().length === 0) {
+    <div class="empty"><h2>No routes yet</h2><p>Routes will appear here once they are set up.</p></div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Route</th>
+            <th scope="col">From and to</th>
+            <th scope="col" class="num">Distance</th>
+            <th scope="col" class="num">Est. time</th>
+            <th scope="col" class="num">Vehicles</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of routes(); track r.id) {
+            <tr>
+              <td><a class="strong" [routerLink]="['/routes', r.id]">{{ r.name }}</a></td>
+              <td>{{ r.origin }} to {{ r.destination }}</td>
+              <td class="num">{{ r.distanceKm }} km</td>
+              <td class="num">{{ formatDuration(r.estimatedMinutes) }}</td>
+              <td class="num">{{ r.vehicleCount }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

@@ -1,0 +1,74 @@
+<div class="page-head">
+  <div>
+    <h1>Vehicles</h1>
+    <p class="live"><span class="live-dot" aria-hidden="true"></span>Live, refreshes every 5 seconds</p>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert" role="alert">
+    <p>Can't reach the tracking API. Check that it is running on http://localhost:8080. This page keeps retrying.</p>
+  </div>
+}
+
+@if (loading()) {
+  <p class="status" role="status">Loading vehicles…</p>
+}
+
+@if (vehicles().length > 0) {
+  <div class="chips" role="group" aria-label="Filter by status">
+    @for (f of filters; track f.value) {
+      <button type="button" class="chip" [class.active]="filter() === f.value" [attr.aria-pressed]="filter() === f.value" (click)="filter.set(f.value)">
+        {{ f.label }} <span class="chip-count">{{ counts()[f.value] }}</span>
+      </button>
+    }
+  </div>
+
+  @if (visible().length === 0) {
+    <div class="empty"><p>No vehicles with that status right now.</p></div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Vehicle</th>
+            <th scope="col">Status</th>
+            <th scope="col">Driver</th>
+            <th scope="col">Route</th>
+            <th scope="col" class="num">Speed</th>
+            <th scope="col">Last update</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of visible(); track v.id) {
+            <tr>
+              <td>
+                <a class="vehicle-link" [routerLink]="['/vehicles', v.id]">
+                  <span class="plate">{{ v.registrationNumber }}</span>
+                  <span class="sub">{{ v.make }} {{ v.model }}, {{ v.manufactureYear }}</span>
+                </a>
+              </td>
+              <td><span [class]="'status-chip status-' + v.status.toLowerCase()">{{ v.status | titlecase }}</span></td>
+              <td>
+                @if (v.driver) {
+                  <a [routerLink]="['/drivers', v.driver.id]">{{ v.driver.fullName }}</a>
+                } @else {
+                  <span class="muted">Unassigned</span>
+                }
+              </td>
+              <td>
+                @if (v.route) {
+                  <a [routerLink]="['/routes', v.route.id]">{{ v.route.origin }} to {{ v.route.destination }}</a>
+                } @else {
+                  <span class="muted">No route</span>
+                }
+              </td>
+              <td class="num">{{ v.speedKph === null ? '-' : (v.speedKph | number: '1.0-0') + ' km/h' }}</td>
+              <td class="mono">{{ v.lastUpdated | date: 'HH:mm:ss' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

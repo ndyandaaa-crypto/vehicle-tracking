@@ -1,0 +1,59 @@
+<a class="back" routerLink="/routes">Back to routes</a>
+
+@if (loading()) {
+  <p class="status" role="status">Loading route…</p>
+}
+
+@if (error()) {
+  <div class="alert" role="alert"><p>{{ error() }}</p></div>
+}
+
+@if (route(); as r) {
+  <div class="page-head">
+    <div>
+      <h1>{{ r.name }}</h1>
+      <p class="muted">{{ r.distanceKm }} km, about {{ formatDuration(r.estimatedMinutes) }}</p>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <section class="card" aria-labelledby="map-title">
+      <h2 id="map-title">Map</h2>
+      <p class="live"><span class="live-dot" aria-hidden="true"></span>Vehicle positions update every 5 seconds</p>
+      <app-route-map [waypoints]="r.waypoints" [markers]="markers()" />
+    </section>
+
+    <div class="stack">
+      <section class="card" aria-labelledby="stops-title">
+        <h2 id="stops-title">Stops</h2>
+        <ol class="stops">
+          @for (w of r.waypoints; track $index) {
+            <li>
+              <span class="stop-name">{{ w.name }}</span>
+              <span class="mono sub">{{ w.latitude | number: '1.4-4' }}, {{ w.longitude | number: '1.4-4' }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+
+      <section class="card" aria-labelledby="veh-title">
+        <h2 id="veh-title">Vehicles on this route</h2>
+        @if (r.vehicles.length === 0) {
+          <p class="muted">No vehicles are assigned to this route.</p>
+        } @else {
+          <ul class="plain-list">
+            @for (v of r.vehicles; track v.id) {
+              <li>
+                <a class="vehicle-link" [routerLink]="['/vehicles', v.id]">
+                  <span class="plate">{{ v.registrationNumber }}</span>
+                  <span class="sub">{{ v.driver ? v.driver.fullName : 'No driver' }}</span>
+                </a>
+                <span [class]="'status-chip status-' + v.status.toLowerCase()">{{ v.status | titlecase }}</span>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    </div>
+  </div>
+}
